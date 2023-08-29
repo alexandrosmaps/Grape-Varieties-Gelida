@@ -1,0 +1,86 @@
+<html>
+
+<head>
+    <title>Xarel·lo in Gelida</title>
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no">
+
+    <!--La connexió amb l'API de Mapbox-->
+    <script src='https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.js'></script>
+    <link href='https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.css' rel='stylesheet' />
+    <link rel="stylesheet" type="text/css" href="style.css" /> 
+    <script src="script.js"></script>
+</head>
+
+<body>
+    
+
+    <div id="legend-grapes" class="legend">
+        <h4>🍇Where to find Xarel·lo grape variety</h4>
+        <h4>🌍Gelida, Penedès, Catalunya</h4>
+        <div><span style="background-color: #bc80bd"></span>Xarel·lo (aka Pansa blanca, Pansal)</div>
+        <div><span style="background-color: #8dd3c7"></span>Not Xarel·lo</div>
+        <a href="https://analisi.transparenciacatalunya.cat/Medi-Rural-Pesca/Mapa-de-cultius-de-Catalunya-amb-origen-DUN/e7kw-9ebb"><h5>💾Data from Mapa de cultius de Catalunya amb origen DUN</h5></a>
+        <a href="https://www.linkedin.com/in/%C3%A0lex-cubells-i-barrufet-08336413b/"><h5>🤟🏼 © Àlex Cubells Barrufet</h5></a>
+    </div>
+
+
+    <!--Creem l'element DIVISION on anirà el nostre mapa-->
+    <div id="map"></div>
+
+    <!--Afegim el nostre token d'accès a Mapbox-->
+    <script>
+        mapboxgl.accessToken = 'pk.eyJ1IjoiYWxleGFuZHJvc21hcHMiLCJhIjoiY2xscDN4bWhwMDJ4MjNjcDhia3RwYXloMSJ9.mDYU76E2fkdTLyNzqPRoDg'
+
+        //Creem el nostre mapa
+        const map = new mapboxgl.Map({
+            container: 'map',
+            //Afegim l'estil de mapbox:
+            style: 'mapbox://styles/mapbox/satellite-streets-v12',
+            //El centrem a l'Alt Penedès i fem un zoom especial per les nostres dades
+            center: [1.8495991685392699, 41.44269533683063],
+            zoom: 13.5
+
+        });
+        //Afegim la capa en GEOJSON de la que ja disposem. Important l'AddSource. Aquí primer havíem copiat tot el geojson, però ocupa massa
+        //Millor tenir les dades en un arxiu separat i cridar-les
+        map.on('load', () => {
+            map.addSource('mapa-gelida', {
+                'type': 'geojson',
+                'data': 
+                'https://github.com/alexandrosmaps/Grape-Varieties-Gelida/blob/main/Mapa%20Vinyes%20Gelida_DUN.geojson'
+            });
+
+
+            map.addLayer(
+                {
+                    'id': 'grapes',
+                    'source': 'mapa-gelida',
+                    'type': 'fill',
+                    'filter': ['==', '$type', 'Polygon'],
+
+                    'paint': {
+                        'fill-color': [
+                        'match',
+                            ['get', 'Variety'],
+                            'XAB Xarel.lo, Pansa blanca, Pansal', '#bc80bd',
+                            '#8dd3c7',
+                            
+                        ],
+                        'fill-opacity': 0.4
+                    },
+
+                    
+                });
+
+
+        });
+
+
+        //Element per posar el mapa a pantalla completa
+        map.addControl(new mapboxgl.FullscreenControl(), 'top-right');
+        //Element per tenir el control del zoom + - i de navegació
+        map.addControl(new mapboxgl.NavigationControl(), 'top-right');
+    </script>
+</body>
+
+</html>
